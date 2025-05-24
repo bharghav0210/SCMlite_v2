@@ -15,7 +15,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 # --- Configuration ---
-"""
+
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 ALGORITHM = os.getenv("JWT_ALGORITHM")
 raw_expire_minutes = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10")
@@ -26,15 +26,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(raw_expire_minutes)
 
 RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
-MONGO_URI = os.getenv("MONGO_URI")
 
-"""
  
 SECRET_KEY="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-ALGORITHM="HS256"
+ALGORITHM="HS256" 
  
 ACCESS_TOKEN_EXPIRE_MINUTES=10
-MONGO_URI="mongodb+srv://bhargavmadhiraju123:Bharghav123@cluster0.p6h7hjw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+MONGO_URI= os.getenv("MONGO_URI")
 RECAPTCHA_SITE_KEY="6Lca5TArAAAAADRedne525SsKt5jf-252ADg2uBS"
 RECAPTCHA_SECRET_KEY="6Lca5TArAAAAAK2-XxkeJ1sOcIbu__yFhgBU4JWM"
  
@@ -63,7 +61,6 @@ db = client["projectfast"]
 users_collection = db["user"]
 logins_collection = db["logins"]
 shipment_collection = db["shipments"]
-db = client['sensor_database']
 collection = db['sensor_data_collection']
 
 # ---------------------------
@@ -97,8 +94,7 @@ def post_signup(
     fullname: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-    confirm_password: str = Form(...),
-    role: str = Form(...)
+    confirm_password: str = Form(...)
 ):
     if password != confirm_password:
         request.session["flash"] = "Passwords do not match."
@@ -108,15 +104,12 @@ def post_signup(
         request.session["flash"] = "Email already registered."
         return RedirectResponse(url="/signup", status_code=status.HTTP_302_FOUND)
 
-    if role not in ["user", "admin"]:
-        role = "user"
-
     password_hash = pwd_context.hash(password)
     users_collection.insert_one({
         "name": fullname,
         "email": email,
         "password_hash": password_hash,
-        "role": role,
+        "role": "user",
         "created_at": datetime.utcnow()
     })
 
@@ -151,10 +144,10 @@ async def post_login(
             "status": "success"
         })
 
-        if user.get("role") == "admin":
-            return RedirectResponse(url="/admin-dashboard", status_code=status.HTTP_302_FOUND)
-        else:
-            return RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(
+            url="/admin-dashboard" if user.get("role") == "admin" else "/dashboard",
+            status_code=status.HTTP_302_FOUND
+        )
 
     logins_collection.insert_one({
         "email": username,
@@ -240,31 +233,85 @@ async def create_shipment(
     return templates.TemplateResponse("create_shipment.html", {"request": request, "flash": flash_message})
 
 @app.get("/user_management", response_class=HTMLResponse)
+
 def user_management(request: Request):
+
     if request.session.get("role") != "admin":
-        return RedirectResponse("/login")
+
+        return RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
+
     users = list(users_collection.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
+
     return templates.TemplateResponse("user_management.html", {"request": request, "users": users})
 
-@app.get("/edit-user/{email}", response_class=HTMLResponse)
-def edit_user(email: str, request: Request):
-    user = users_collection.find_one({"email": email}, {"_id": 0, "name": 1, "email": 1, "role": 1})
-    if not user:
-        request.session["flash"] = "User not found."
-        return RedirectResponse("/user_management")
-    return templates.TemplateResponse("edit_user.html", {"request": request, "user": user})
 
-@app.post("/edit-user/{email}")
-def post_edit_user(email: str, request: Request, name: str = Form(...), role: str = Form(...)):
-    users_collection.update_one({"email": email}, {"$set": {"name": name, "role": role}})
-    request.session["flash"] = "User updated."
-    return RedirectResponse("/user_management")
+
+@app.get("/edit-users/{email}", response_class=HTMLResponse)
+
+async def get_edit_user(request: Request, email: str):
+
+    user = users_collection.find_one({"email": email}, {"_id": 0, "name": 1, "role": 1, "email": 1})
+
+    flash = request.session.pop("flash", None)
+
+    if not user:
+
+        request.session["flash"] = "User not found."
+
+        return RedirectResponse("/user_management", status_code=status.HTTP_302_FOUND)
+
+    return templates.TemplateResponse("edit_users.html", {"request": request, "user": user, "flash": flash})
+
+
+
+@app.post("/update-user/{email}")
+
+async def update_user(request: Request, email: str, name: str = Form(...), new_email: str = Form(...), role: str = Form(...)):
+
+    result = users_collection.update_one(
+
+        {"email": email},
+
+        {"$set": {"name": name, "email": new_email, "role": role}}
+
+    )
+
+    if result.modified_count == 1:
+
+        request.session["flash"] = "User updated successfully."
+
+    else:
+
+        request.session["flash"] = "No changes made or user not found."
+
+    return RedirectResponse("/user_management", status_code=status.HTTP_302_FOUND)
+
+
 
 @app.get("/delete-user/{email}")
+
 def delete_user(email: str, request: Request):
+
     users_collection.delete_one({"email": email})
+
     request.session["flash"] = "User deleted."
-    return RedirectResponse("/user_management")
+
+    return RedirectResponse("/user_management", status_code=status.HTTP_302_FOUND)
+
+@app.get("/assign-admin/{email}")
+def assign_admin(email: str, request: Request):
+    user = users_collection.find_one({"email": email})
+    if not user:
+        request.session["flash"] = "User not found."
+        return RedirectResponse("/user_management", status_code=status.HTTP_302_FOUND)
+    result = users_collection.update_one({"email": email}, {"$set": {"role": "admin"}})
+    if result.modified_count == 1:
+        request.session["flash"] = f"{email} is now an admin."
+    else:
+        request.session["flash"] = "No changes made or user already admin."
+    return RedirectResponse("/user_management", status_code=status.HTTP_302_FOUND)
+
+# ...existing code...
 import logging
 
 # Create a logger
@@ -463,7 +510,15 @@ def account_page(request: Request):
 @app.get("/device-data", response_class=HTMLResponse)
 async def device_data(request: Request):
     data = list(collection.find().sort([('_id', -1)]).limit(10))
-    return templates.TemplateResponse("device_data.html", {"request": request, "data": data})
+    # Convert ObjectId to string
+    formatted_data = []
+    for item in data:
+        item['_id'] = str(item['_id'])
+        formatted_data.append(item)
+    return templates.TemplateResponse("device_data.html", {
+        "request": request, 
+        "data": formatted_data
+    })
 
 @app.get("/logout")
 def logout(request: Request):

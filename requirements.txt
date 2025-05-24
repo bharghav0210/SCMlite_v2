@@ -26,8 +26,11 @@ python-dotenv
 # HTTP requests
 requests
 
-#Kafka
+# Kafka client
 kafka-python
 
-#jwt tokens
+# JWT tokens
 PyJWT
+
+# JOSE (JavaScript Object Signing and Encryption) - for JWT handling
+python-jose

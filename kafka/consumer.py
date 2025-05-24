@@ -13,7 +13,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://bhargavmadhiraju123:Bharghav12
 while True:
     try:
         client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
-        db = client['sensor_database']
+        db = client['projectfast']
         collection = db['sensor_data_collection']
         print("Connected to MongoDB.")
         break
@@ -49,3 +49,4 @@ for message in consumer:
         print("Inserted into MongoDB.\n")
     except Exception as e:
         print(f"MongoDB insert error: {e}")
+       

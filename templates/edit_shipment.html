@@ -5,8 +5,6 @@
   <title>Edit Shipments</title>
   <link rel="stylesheet" href="{{ url_for('static', path='edit_shipments.css') }}">
   <style>
-    /* Your existing styles here (I kept them) */
-
     body, html {
       margin: 0;
       padding: 0;
@@ -15,43 +13,150 @@
       min-height: 100vh;
     }
 
-    .topbar { background: linear-gradient(to right, #c1dfff, #f5e1ff); padding: 20px 40px; display: flex; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.08);}
-    .brand { display: flex; align-items: center; }
-    .brand img { width: 50px; margin-right: 10px; }
-    .brand h1 { font-size: 20px; color: #4b4453; margin: 0; }
-    .nav-menu a, .logout-btn { margin-left: 10px; text-decoration: none; font-weight: 500; color: #2f2f2f; padding: 8px 12px; border-radius: 8px; transition: 0.3s; }
-    .logout-btn { background-color: #ff8c8c; color: white; border: none; }
-    .logout-btn:hover { background-color: #ff6b6b; }
+    .topbar {
+      background: linear-gradient(to right, #c1dfff, #f5e1ff);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
 
-    .container { padding: 130px 20px 60px; display: flex; justify-content: center; }
-    .edit-shipment-wrapper { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); width: 100%; }
-    h2 { text-align: center; color: #2c3e50; }
+    .brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand img {
+      width: 50px;
+      margin-right: 10px;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      color: #4b4453;
+      margin: 0;
+    }
+
+    .nav-menu a, .logout-btn {
+      margin-left: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      color: #2f2f2f;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .logout-btn {
+      background-color: #ff8c8c;
+      color: white;
+      border: none;
+    }
+
+    .logout-btn:hover {
+      background-color: #ff6b6b;
+    }
+
+    .container {
+      padding: 130px 20px 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .edit-shipment-wrapper {
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
 
     input[type="text"], input[type="date"], select, textarea {
-      width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc;
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: center; border: 1px solid #050505; }
-    th { background: #f5f5f5; cursor: pointer; }
-    .action-buttons a { padding: 6px 12px; margin: 0 3px; color: white; border-radius: 6px; text-decoration: none; }
-    .action-buttons a.edit { background: #3498db; }
-    .action-buttons a.delete { background: #e74c3c; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #050505;
+    }
+
+    th {
+      background: #f5f5f5;
+      cursor: pointer;
+    }
+
+    .action-buttons a {
+      padding: 6px 12px;
+      margin: 0 3px;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .action-buttons a.edit {
+      background: #3498db;
+    }
+
+    .action-buttons a.delete {
+      background: #e74c3c;
+    }
 
     .export-btn, #searchInput {
-      margin-bottom: 10px; padding: 8px; width: 200px;
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 200px;
     }
 
-    /* Modal */
     .modal {
-      display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto;
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
       background-color: rgba(0,0,0,0.4);
     }
+
     .modal-content {
-      background-color: #fff; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px;
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%;
+      border-radius: 8px;
     }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-    .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover, .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -75,7 +180,8 @@
     <h2>Edit Shipments</h2>
 
     <input type="text" id="searchInput" placeholder="Search shipments...">
-    <button class="export-btn" onclick="window.location.href='/export-shipments'">Export to CSV/Excel</button>
+    <button class="export-btn" onclick="downloadTableAsCSV()">Download CSV</button>
+    <button class="export-btn" onclick="downloadTableAsExcel()">Download Excel</button>
 
     <table id="shipmentTable">
       <thead>
@@ -165,6 +271,7 @@
   </div>
 </div>
 
+<!-- Scripts -->
 <script>
 function sortTable(n) {
   var table = document.getElementById("shipmentTable"), switching = true, dir = "asc", switchcount = 0;
@@ -200,6 +307,39 @@ function openModal(shipmentId) {
 
 function closeModal() {
   document.getElementById("editModal").style.display = "none";
+}
+
+// CSV Export
+function downloadTableAsCSV(filename = 'shipments.csv') {
+  const table = document.getElementById("shipmentTable");
+  let csv = [];
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = [], cols = table.rows[i].querySelectorAll("td, th");
+    for (let j = 0; j < cols.length - 1; j++) {  // Skip last column (Action)
+      row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+    }
+    csv.push(row.join(","));
+  }
+  const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(csvFile);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Excel Export
+function downloadTableAsExcel(filename = 'shipments.xls') {
+  const table = document.getElementById("shipmentTable");
+  let html = "<table border='1'>" + table.innerHTML + "</table>";
+  const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 
