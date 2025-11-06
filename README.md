@@ -1,4 +1,4 @@
-# SCMlite_v2: Supply Chain Management System
+# SCMlite: Supply Chain Management System
 
 SCMlite_v2 is a secure and robust web application for managing supply chain shipments, built with FastAPI and MongoDB. It features a complete user authentication system, role-based access control (admin/user), and full CRUD (Create, Read, Update, Delete) operations for shipments and user management.
 
@@ -6,7 +6,7 @@ The application is containerized using Docker and designed for deployment on clo
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 * **User Authentication:** Secure user registration (`/signup`) and login (`/login`) system with password hashing (`bcrypt`) and session handling.
 * **Role-Based Access Control (RBAC):**
@@ -30,7 +30,7 @@ The application is containerized using Docker and designed for deployment on clo
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 * **Backend:** [FastAPI](https://fastapi.tiangolo.com/) (Python 3)
 * **Database:** [MongoDB](https://www.mongodb.com/) (connected via MongoDB Atlas)
@@ -42,7 +42,7 @@ The application is containerized using Docker and designed for deployment on clo
 
 ---
 
-## ⚙️ Setup and Installation
+##  Setup and Installation
 
 You can run the application locally using either Docker (recommended) or a Python virtual environment.
 
@@ -69,4 +69,5 @@ MONGO_URI="mongodb+srv://<username>:<password>@<cluster-url.mongodb.net>/..."
 # Google reCAPTCHA
 RECAPTCHA_SITE_KEY="your_recaptcha_site_key"
 RECAPTCHA_SECRET_KEY="your_recaptcha_secret_key"
+
 
